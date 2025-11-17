@@ -9,13 +9,13 @@ API_KEY = os.getenv("GUARDIAN_API_KEY")
 BASE_URL = "https://content.guardianapis.com/search"
 CATEGORIES = ["news", "sport", "opinion", "culture"]
 PAGE_SIZE = 20
-PAGES_PER_CATEGORY = 5
+# PAGES_PER_CATEGORY = 12
 SLEEP_BETWEEN_REQUESTS = 0.5
 
-def fetch_and_save_articles():
+def fetch_and_save_articles(start_page=1):
     for category in CATEGORIES:
         print(f"\nCollecting articles for category: {category}")
-        for page in range(1, PAGES_PER_CATEGORY + 1):
+        for page in range(start_page, start_page + 12):
             print(f"  Fetching page {page}...")
             params = {
                 "api-key": API_KEY,
@@ -72,4 +72,4 @@ def save_article(article, category):
     print(f"    Saved: {article_id}")
 
 if __name__ == "__main__":
-    fetch_and_save_articles()
+    fetch_and_save_articles(109) # run with 121 (109 done)
