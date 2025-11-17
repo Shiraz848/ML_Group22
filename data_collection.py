@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 API_KEY = os.getenv("GUARDIAN_API_KEY")
 BASE_URL = "https://content.guardianapis.com/search"
-CATEGORIES = ["news", "sport", "opinion", "culture"]
+CATEGORIES = ["news", "sport", "commentisfree", "culture"]
 PAGE_SIZE = 20
 # PAGES_PER_CATEGORY = 12
 SLEEP_BETWEEN_REQUESTS = 0.5
@@ -72,4 +72,4 @@ def save_article(article, category):
     print(f"    Saved: {article_id}")
 
 if __name__ == "__main__":
-    fetch_and_save_articles(109) # run with 121 (109 done)
+    fetch_and_save_articles(121) # run with 121 (109 done)
