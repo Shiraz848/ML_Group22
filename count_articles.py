@@ -1,7 +1,7 @@
 from pathlib import Path
 
 base_dir = Path("data")
-categories = ["news", "sport", "opinion", "culture"]
+categories = ["news", "sport", "commentisfree", "culture"]
 total = 0
 
 print("🗂️  Number of articles per category:\n")
