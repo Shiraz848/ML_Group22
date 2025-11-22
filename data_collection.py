@@ -7,7 +7,8 @@ from dotenv import load_dotenv
 load_dotenv()
 API_KEY = os.getenv("GUARDIAN_API_KEY")
 BASE_URL = "https://content.guardianapis.com/search"
-CATEGORIES = ["news", "sport", "commentisfree", "culture"]
+# CATEGORIES = ["news", "sport", "commentisfree", "culture"]
+CATEGORIES = ["commentisfree", "culture"]
 PAGE_SIZE = 20
 # PAGES_PER_CATEGORY = 12
 SLEEP_BETWEEN_REQUESTS = 0.5
@@ -15,7 +16,7 @@ SLEEP_BETWEEN_REQUESTS = 0.5
 def fetch_and_save_articles(start_page=1):
     for category in CATEGORIES:
         print(f"\nCollecting articles for category: {category}")
-        for page in range(start_page, start_page + 12):
+        for page in range(start_page, start_page + 700):
             print(f"  Fetching page {page}...")
             params = {
                 "api-key": API_KEY,
