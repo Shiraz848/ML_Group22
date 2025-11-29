@@ -33,8 +33,9 @@ def parse_article_file(file_path):
         headline = lines[4].strip() if len(lines) > 4 else ""
 
         # Body text starts after the separator line (line 6)
-        # Join all remaining lines and replace newlines with spaces to prevent CSV corruption
-        body_text = ' '.join(lines[6:]).strip() if len(lines) > 6 else ""
+        # Join all remaining lines and clean up all whitespace (newlines, tabs, etc.)
+        raw_text = ' '.join(lines[6:]) if len(lines) > 6 else ""
+        body_text = re.sub(r'\s+', ' ', raw_text).strip()
 
         # Label is the category folder name
         label = file_path.parent.name
@@ -106,7 +107,7 @@ def create_sensed_data_csv(output_file="sensed_data.csv"):
     df = df[column_order]
 
     # Save to CSV
-    df.to_csv(output_file, index=False, encoding='utf-8')
+    df.to_csv(output_file, index=False, encoding='utf-8', lineterminator='\n')
 
     print(f"\nSensing complete!")
     print(f"Total articles processed: {len(df)}")
@@ -114,7 +115,65 @@ def create_sensed_data_csv(output_file="sensed_data.csv"):
     print(df['label'].value_counts())
     print(f"\nData saved to: {output_file}")
 
+    # Clean the CSV file from broken lines
+    clean_csv_file(output_file)
+
     return df
+
+
+def clean_csv_file(file_path):
+    """
+    Post-process the CSV to remove broken lines.
+    Identifies lines where the first column (label) is not valid,
+    and removes that line AND the preceding line.
+    """
+    print("\nRunning CSV cleanup...")
+    # Added 'label' back to preserve header, handle BOM later
+    valid_labels = {'news', 'sport', 'commentisfree', 'culture', 'label'}
+    
+    path = Path(file_path)
+    if not path.exists():
+        return
+
+    try:
+        with open(path, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+        
+        lines_to_skip = set()
+        
+        for i, line in enumerate(lines):
+            # Split by comma to check the first column
+            parts = line.split(',')
+            if not parts:
+                continue
+            
+            # Clean up the first column value: strip whitespace, quotes, and BOM
+            first_col = parts[0].strip().replace('"', '').replace('\ufeff', '')
+            
+            # If the first column is not a known label
+            if first_col not in valid_labels:
+                # Mark this line for deletion (it's a broken fragment)
+                lines_to_skip.add(i)
+                # Mark the previous line for deletion (it's the incomplete parent of the fragment)
+                if i > 0:
+                    lines_to_skip.add(i - 1)
+        
+        if not lines_to_skip:
+            print("No broken lines found.")
+            return
+
+        print(f"Found {len(lines_to_skip)} lines to remove (broken lines + predecessors).")
+        
+        # Write back only the good lines
+        with open(path, 'w', encoding='utf-8') as f:
+            for i, line in enumerate(lines):
+                if i not in lines_to_skip:
+                    f.write(line)
+                    
+        print("Cleanup complete.")
+            
+    except Exception as e:
+        print(f"Error during CSV cleanup: {e}")
 
 
 if __name__ == "__main__":
