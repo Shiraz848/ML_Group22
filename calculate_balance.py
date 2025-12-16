@@ -1,11 +1,6 @@
 import pandas as pd
 
 def calculate_articles_to_balance(csv_path="preprocessed_data.csv", target="max"):
-    """
-    מחשבת כמה כתבות חסרות בכל קטגוריה כדי לאזן את הדאטה:
-    - לפי הקטגוריה עם הכי הרבה כתבות (target='max')
-    - או לפי ממוצע (target='mean')
-    """
 
     df = pd.read_csv(csv_path)
     label_counts = df["label"].value_counts()
@@ -17,10 +12,10 @@ def calculate_articles_to_balance(csv_path="preprocessed_data.csv", target="max"
     else:
         raise ValueError("target must be 'max' or 'mean'")
 
-    print("\n📊 Current Distribution:")
+    print("\nCurrent Distribution:")
     print(label_counts)
 
-    print(f"\n🎯 Target per class: {target_count}")
+    print(f"\nTarget per class: {target_count}")
     print("➕ Articles needed to balance:")
 
     needed = target_count - label_counts
